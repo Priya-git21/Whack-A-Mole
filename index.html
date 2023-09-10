@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Whack A Mole!</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="icon" href="https://fav.farm/✅" />
+    </head>
+
+    <body>
+        <h1>
+            Whack-a-mole!
+            <span class="score">0</span>
+            <span class="out_of">0</span>
+            <span class="out_of1">Total Chances</span>
+            <br>
+            <button onClick="startGame()" class="button">Start!</button>
+        </h1>
+        <div class="game">
+            <div class="hole hole1">
+                <div class="mole"></div>
+            </div>
+            <div class="hole hole2">
+                <div class="mole"></div>
+            </div>
+            <div class="hole hole3">
+                <div class="mole"></div>
+            </div>
+            <div class="hole hole4">
+                <div class="mole"></div>
+            </div>
+            <div class="hole hole5">
+                <div class="mole"></div>
+            </div>
+            <div class="hole hole6">
+                <div class="mole"></div>
+            </div>
+        </div>
+        <audio id="whackSound" src="whack.mp3"></audio>
+
+        <script>
+         const holes = document.querySelectorAll('.hole');
+         const scoreBoard = document.querySelector('.score');
+         const total = document.querySelector('.out_of');
+         const moles = document.querySelectorAll('.mole');
+         let lastHole;
+         let score = 0;
+         let out_of = 0;
+         
+         // random time between min and max... taking as 200 ms and 1 sec
+         function randomTime(min, max) {
+           return Math.round(Math.random() * (max - min) + min);
+         }
+         
+         // to select the hole number
+         function randomHole(holes) {
+           const idx = Math.floor(Math.random() * holes.length);
+           const hole = holes[idx];
+           if (hole === lastHole) {
+            // to avoid getting same hole twice....
+             console.log('Ah nah thats the same one bud');
+             return randomHole(holes);
+           }
+           lastHole = hole;
+           out_of++;
+           total.textContent = out_of;
+           return hole;
+         }
+         
+         function peep() {
+           const time = randomTime(200, 1000);
+           const hole = randomHole(holes);
+           // to make them appear whenever their hole is selected....
+           hole.classList.add('up');
+           setTimeout(() => {
+             hole.classList.remove('up');
+             peep();
+           }, time);
+        //    taking same amount of to go off as it took to come up...
+         }
+         
+         function startGame() {
+           scoreBoard.textContent = 0;
+           timeUp = false;
+           score = 0;
+           out_of = 0;
+           peep();
+         }
+         
+         function bonk(e) {
+           // to avoid false clicks...
+           if(!e.isTrusted) return;
+           score++;
+           this.parentNode.classList.remove('up');
+           scoreBoard.textContent = score;
+            // whack sound...
+           const whackSound = document.getElementById('whackSound');
+            whackSound.currentTime = 0; // Reset sound to the beginning
+            whackSound.play();
+         }
+         
+         moles.forEach(mole => mole.addEventListener('click', bonk));       
+      </script>
+    </body>
+</html>
